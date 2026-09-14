@@ -1,48 +1,8 @@
-<!doctype html>
-<html lang="pl">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ASF Idle Manager</title><link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="glow g1"></div><div class="glow g2"></div>
-<main>
-<header>
-  <div class="brand"><div class="logo">⚡</div><div><div class="kicker">ARCHI STEAM FARM</div><h1>Idle Manager</h1><p>Buduj listę gier dla <code>GamesPlayedWhileIdle</code></p></div></div>
-  <div class="local"><i></i> Tylko lokalnie</div>
-</header>
-
-<section class="hero">
-  <div><span class="badge">ASF CONFIG BUILDER</span><h2>Wybierz gry. <em>Skopiuj gotowca.</em></h2><p>Bez backendu i bez połączenia z ASF. Wszystko zapisuje się w tej przeglądarce.</p></div>
-</section>
-
-<section class="layout">
-<div class="left">
-  <div class="searchbar"><span>⌕</span><input id="search" placeholder="Wyszukaj grę lub AppID..." autocomplete="off"><kbd>Ctrl K</kbd></div>
-  <div class="subbar"><div><b id="result">0</b> gier</div><div class="subactions"><button id="selectVisible">Zaznacz widoczne</button><button id="clear">Wyczyść wybór</button><button id="add">＋ Dodaj ręcznie</button></div></div>
-  <div id="list"></div><div id="empty" class="empty hidden">🎮<strong>Brak wyników</strong><span>Spróbuj innej nazwy albo dodaj AppID ręcznie.</span></div>
-</div>
-
-<aside>
-  <div class="aside-head"><div><div class="kicker">GENEROWANIE</div><h3>Twój gotowiec</h3></div><div class="count"><b id="count">0</b><span>/ 32</span></div></div>
-  <div id="limit" class="limit hidden">⚠ Osiągnięto limit 32 gier.</div>
-  <label>GamesPlayedWhileIdle</label>
-  <div class="code"><pre id="param">"GamesPlayedWhileIdle": []</pre><button data-copy="param">⧉</button></div>
-  <label>Gotowy JSON</label>
-  <div class="code big"><pre id="json">{
-  "GamesPlayedWhileIdle": []
-}</pre><button data-copy="json">⧉</button></div>
-  <div class="chosen"><div class="chosen-title">Wybrane</div><div id="chips" class="chips"></div></div>
-  <button id="reset" class="reset">↻ Reset lokalnych danych</button>
-</aside>
-</section>
-<footer>ASF Idle Manager • nie wysyła konfiguracji do ASF • dane przechowywane w localStorage</footer>
-</main>
-
-<dialog id="dlg"><form id="form">
-<div class="modal-head"><div><div class="kicker">WŁASNA POZYCJA</div><h2>Dodaj grę</h2></div><button type="button" id="close">×</button></div>
-<label>Nazwa</label><input id="name" required maxlength="80" placeholder="np. Counter-Strike 2">
-<label>AppID</label><input id="id" required inputmode="numeric" pattern="[0-9]+" placeholder="np. 730">
-<div id="err"></div><div class="modal-actions"><button type="button" id="cancel">Anuluj</button><button class="primary">Dodaj grę</button></div>
-</form></dialog><div id="toast"></div><script src="app.js"></script>
-</body></html>
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ASF Idle Manager v3</title><link rel="stylesheet" href="style.css"></head><body><div class="orb o1"></div><div class="orb o2"></div><div class="app"><aside><div class="logo">⚡<b>ASF</b><small>IDLE MANAGER</small></div><nav><button class="on" data-v="home">◈ Dashboard</button><button data-v="games">▦ Gry</button><button data-v="presets">✦ Presety</button><button data-v="accounts">♙ Konta</button><button data-v="data">⇅ Import / Export</button></nav><footer>● LOCAL MODE<br><small>Brak połączenia z ASF</small></footer></aside><main><header><div><small>ARCHI STEAM FARM</small><h1 id="title">Dashboard</h1><p id="sub">Wybierz gry i wygeneruj konfigurację idle.</p></div><div><button id="quick">＋ Quick Add</button><button class="primary" id="add">＋ Dodaj grę</button></div></header>
+<section id="home" class="view"><div class="hero"><span>ASF CONFIG BUILDER</span><h2>Wybierz zestaw. <em>Skopiuj gotowca.</em></h2><p>Nowoczesny lokalny panel do tworzenia GamesPlayedWhileIdle.</p><strong>⚡</strong></div><div class="stats"><div><small>Biblioteka</small><b id="sg">0</b><i>gier</i></div><div><small>Wybrane</small><b id="ss">0</b><i>/ 32</i></div><div><small>Presety</small><b id="sp">0</b></div><div><small>Konta</small><b id="sa">0</b></div></div><div class="tw"><div class="panel"><h3>Szybki wybór</h3><div id="quickGames"></div></div><div class="panel"><h3>Aktualny gotowiec <label id="dc">0 / 32</label></h3><pre id="dout"></pre><button class="primary wide" data-copy="dout">⧉ Kopiuj</button></div></div></section>
+<section id="games" class="view"><div class="panel"><div class="search">⌕ <input id="search" placeholder="Wyszukaj grę lub AppID..."><kbd>Ctrl K</kbd></div><div class="bar"><span id="rc"></span><div><select id="sort"><option value="name">Nazwa A–Z</option><option value="id">AppID</option><option value="sel">Wybrane</option></select><button id="sv">Zaznacz widoczne</button><button id="cl">Wyczyść</button></div></div><div id="list"></div></div></section>
+<section id="presets" class="view"><div class="panel"><div class="head"><div><h3>Presety</h3><small>Zapisuj często używane zestawy.</small></div><button class="primary" id="preset">＋ Zapisz wybór</button></div><div id="plist"></div></div></section>
+<section id="accounts" class="view"><div class="panel"><div class="head"><div><h3>Konta</h3><small>Lokalne profile bez logowania do Steam.</small></div><button class="primary" id="account">＋ Dodaj konto</button></div><div id="alist"></div></div></section>
+<section id="data" class="view"><div class="data"><div class="panel"><h2>⇅</h2><h3>Eksport</h3><p>Zapisz cały panel do pliku JSON.</p><button class="primary wide" id="export">Eksportuj</button></div><div class="panel"><h2>↥</h2><h3>Import</h3><p>Wczytaj wcześniejszą kopię.</p><button class="wide" id="import">Importuj</button><input id="file" type="file" accept=".json" hidden></div><div class="panel"><h2>↻</h2><h3>Reset</h3><p>Przywróć ustawienia początkowe.</p><button class="danger wide" id="reset">Resetuj wszystko</button></div></div></section>
+<div class="output panel"><div><small>LIVE OUTPUT</small><b>GamesPlayedWhileIdle <label id="bc">0 / 32</label></b></div><div class="code"><pre id="out"></pre><button data-copy="out">⧉</button></div><div id="chips"></div></div><p class="note">ASF Idle Manager v3 · 100% lokalnie · dane są przechowywane w localStorage</p></main></div>
+<dialog id="dlg"><form id="gf"><h2>Dodaj grę</h2><input id="gn" required placeholder="Nazwa gry"><input id="gi" required inputmode="numeric" placeholder="AppID"><p id="ge"></p><button type="button" data-x>Anuluj</button><button class="primary">Dodaj</button></form></dialog><dialog id="qdlg"><form id="qf"><h2>Quick Add</h2><textarea id="qi" placeholder="730, 252490, 271590"></textarea><p>Przecinki, spacje i nowe linie są obsługiwane.</p><button type="button" data-x>Anuluj</button><button class="primary">Dodaj</button></form></dialog><div id="toast"></div><script src="app.js"></script></body></html>

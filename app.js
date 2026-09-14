@@ -1,47 +1,17 @@
-const defaults=[
-["Counter-Strike 2",730],["Rust",252490],["Grand Theft Auto V",271590],["Terraria",105600],["Stardew Valley",413150],
-["Euro Truck Simulator 2",227300],["Team Fortress 2",440],["Left 4 Dead 2",550],["Portal 2",620],["PAYDAY 2",218620],
-["ARK: Survival Evolved",346110],["7 Days to Die",251570],["Dead by Daylight",381210],["Valheim",892970],["Palworld",1623730],
-["Baldur's Gate 3",1086940],["Cyberpunk 2077",1091500],["The Witcher 3",292030],["Satisfactory",526870],["Project Zomboid",108600],
-["Dota 2",570],["Apex Legends",1172470],["Warframe",230410],["Among Us",945360],["Hades",1145360],["Hollow Knight",367520],
-["Subnautica",264710],["DayZ",221100],["Squad",393380],["Counter-Strike",10]
-].map(x=>({name:x[0],id:String(x[1]),custom:false}));
-let games=JSON.parse(localStorage.getItem("aim_games")||"null")||defaults;
-let selected=new Set(JSON.parse(localStorage.getItem("aim_selected")||"[]").map(String));
-const $=x=>document.getElementById(x), list=$("list"), search=$("search"), dlg=$("dlg");
-function save(){localStorage.setItem("aim_games",JSON.stringify(games));localStorage.setItem("aim_selected",JSON.stringify([...selected]))}
-function icon(id){return `https://cdn.cloudflare.steamstatic.com/steam/apps/${id}/header.jpg`}
-function render(){
- let q=search.value.toLowerCase().trim(), arr=games.filter(g=>g.name.toLowerCase().includes(q)||g.id.includes(q));
- $("result").textContent=arr.length; $("count").textContent=selected.size;
- $("limit").classList.toggle("hidden",selected.size<32); list.innerHTML="";
- $("empty").classList.toggle("hidden",arr.length>0);
- arr.forEach(g=>{
-  let row=document.createElement("div");row.className="game";
-  row.innerHTML=`<input type="checkbox" ${selected.has(g.id)?"checked":""} ${!selected.has(g.id)&&selected.size>=32?"disabled":""}>
-   <img class="icon" src="${icon(g.id)}" alt="" onerror="this.style.visibility='hidden'"><div class="info"><div class="name"></div><div class="appid">AppID ${g.id}</div></div>${g.custom?'<button class="remove">Usuń</button>':""}`;
-  row.querySelector(".name").textContent=g.name;
-  row.querySelector("input").onchange=e=>{if(e.target.checked){if(selected.size>=32){e.target.checked=false;toast("Maksymalnie 32 gry");return}selected.add(g.id)}else selected.delete(g.id);save();render()};
-  let rm=row.querySelector(".remove");if(rm)rm.onclick=()=>{games=games.filter(x=>x!==g);selected.delete(g.id);save();render()};
-  list.appendChild(row);
- });
- update();
-}
-function update(){
- let ids=[...selected], arr=ids.map(Number);
- $("param").textContent=`"GamesPlayedWhileIdle": [${ids.join(", ")}]`;
- $("json").textContent=JSON.stringify({GamesPlayedWhileIdle:arr},null,2);
- let c=$("chips");c.innerHTML=ids.length? "":"<span class='muted'>Brak wybranych gier</span>";
- ids.forEach(id=>{let g=games.find(x=>x.id===id),x=document.createElement("span");x.className="chip";x.textContent=(g?g.name:"AppID "+id);c.appendChild(x)})
-}
-function toast(t){let x=$("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1500)}
-search.oninput=render;
-document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();search.focus()}});
-$("selectVisible").onclick=()=>{let q=search.value.toLowerCase();games.filter(g=>g.name.toLowerCase().includes(q)||g.id.includes(q)).forEach(g=>{if(selected.size<32)selected.add(g.id)});save();render()};
-$("clear").onclick=()=>{selected.clear();save();render()};
-document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText($(b.dataset.copy).textContent);toast("Skopiowano")}catch{toast("Schowek niedostępny")}});
-$("add").onclick=()=>{ $("name").value="";$("id").value="";$("err").textContent="";dlg.showModal();$("name").focus()};
-$("close").onclick=$("cancel").onclick=()=>dlg.close();
-$("form").onsubmit=e=>{e.preventDefault();let name=$("name").value.trim(),id=$("id").value.trim();if(!/^\d+$/.test(id)){$("err").textContent="AppID musi być liczbą.";return}if(games.some(g=>g.id===id)){$("err").textContent="Ten AppID już istnieje.";return}games.push({name,id,custom:true});save();dlg.close();render();toast("Dodano grę")};
-$("reset").onclick=()=>{if(confirm("Usunąć własne gry i wyczyścić wybór?")){games=defaults;selected.clear();save();render();toast("Zresetowano")}};
-render();
+const D=[["Counter-Strike 2",730],["Rust",252490],["Grand Theft Auto V",271590],["Terraria",105600],["Stardew Valley",413150],["Euro Truck Simulator 2",227300],["Team Fortress 2",440],["Left 4 Dead 2",550],["Portal 2",620],["PAYDAY 2",218620],["ARK: Survival Evolved",346110],["7 Days to Die",251570],["Dead by Daylight",381210],["Valheim",892970],["Palworld",1623730],["Baldur's Gate 3",1086940],["Cyberpunk 2077",1091500],["The Witcher 3",292030],["Satisfactory",526870],["Project Zomboid",108600],["Dota 2",570],["Apex Legends",1172470],["Warframe",230410],["Among Us",945360],["Hades",1145360],["Hollow Knight",367520],["Subnautica",264710],["DayZ",221100],["Squad",393380],["Counter-Strike",10]].map(x=>({name:x[0],id:String(x[1]),custom:false}));
+let games=JSON.parse(localStorage.aim3_games||"null")||D, selected=new Set(JSON.parse(localStorage.aim3_sel||"[]")),presets=JSON.parse(localStorage.aim3_pre||"[]"),accounts=JSON.parse(localStorage.aim3_acc||"[]");const $=id=>document.getElementById(id),save=()=>{localStorage.aim3_games=JSON.stringify(games);localStorage.aim3_sel=JSON.stringify([...selected]);localStorage.aim3_pre=JSON.stringify(presets);localStorage.aim3_acc=JSON.stringify(accounts)},ico=id=>`https://cdn.cloudflare.steamstatic.com/steam/apps/${id}/header.jpg`;
+function toast(t){let x=$("toast");x.textContent=t;x.className="show";setTimeout(()=>x.className="",1500)}
+function output(){let a=[...selected],s=`"GamesPlayedWhileIdle": [${a.join(", ")}]`;$("out").textContent=s;$("dout").textContent=s;$("bc").textContent=$("dc").textContent=`${a.length} / 32`;$("ss").textContent=a.length;let c=$("chips");c.innerHTML=a.length?a.map(id=>`<span class="chip">${games.find(g=>g.id===id)?.name||id}</span>`).join(""):"<span class=muted>Brak wybranych gier</span>"}
+function gamesView(){let q=$("search").value.toLowerCase(),a=games.filter(g=>g.name.toLowerCase().includes(q)||g.id.includes(q)),s=$("sort").value;if(s==="name")a.sort((x,y)=>x.name.localeCompare(y.name));if(s==="id")a.sort((x,y)=>+x.id-+y.id);if(s==="sel")a.sort((x,y)=>(selected.has(y.id)-selected.has(x.id)));$("rc").textContent=a.length+" gier";$("list").innerHTML=a.map(g=>`<div class=game><input type=checkbox ${selected.has(g.id)?"checked":""} ${!selected.has(g.id)&&selected.size>=32?"disabled":""}><img src="${ico(g.id)}" onerror="this.style.visibility='hidden'"><div class=info><b>${g.name.replaceAll("<","&lt;")}</b><small>AppID ${g.id}</small></div>${g.custom?'<button class=remove>Usuń</button>':""}</div>`).join("");[...document.querySelectorAll(".game")].forEach((e,i)=>{let g=a[i],cb=e.querySelector("input");cb.onchange=()=>{if(cb.checked){if(selected.size>=32){cb.checked=false;toast("Limit 32 gier");return}selected.add(g.id)}else selected.delete(g.id);save();refresh()};let rm=e.querySelector(".remove");if(rm)rm.onclick=()=>{games=games.filter(x=>x!==g);selected.delete(g.id);save();refresh()}})}
+function renderCards(){let p=$("plist");p.innerHTML=presets.map((x,i)=>`<div class=card><div><b>${x.name}</b><small>${x.ids.length} gier</small></div><button onclick="loadP(${i})">Wczytaj</button><button onclick="delP(${i})">Usuń</button></div>`).join("")||"<div class=empty>✦<br>Brak presetów</div>";let a=$("alist");a.innerHTML=accounts.map((x,i)=>`<div class=card><div><b>♙ ${x.name}</b><small>${x.ids.length} zapisanych gier</small></div><button onclick="loadA(${i})">Wczytaj</button><button onclick="saveA(${i})">Zapisz wybór</button><button onclick="delA(${i})">Usuń</button></div>`).join("")||"<div class=empty>♙<br>Brak kont</div>"}
+window.loadP=i=>{selected=new Set(presets[i].ids.slice(0,32));save();refresh();toast("Preset wczytany")};window.delP=i=>{presets.splice(i,1);save();refresh();toast("Usunięto")};window.loadA=i=>{selected=new Set(accounts[i].ids.slice(0,32));save();refresh();toast("Konto wczytane")};window.saveA=i=>{accounts[i].ids=[...selected];save();renderCards();toast("Zapisano")};window.delA=i=>{accounts.splice(i,1);save();renderCards();toast("Usunięto")};
+function refresh(){gamesView();output();renderCards();$("sg").textContent=games.length;$("sp").textContent=presets.length;$("sa").textContent=accounts.length;let q=[...games].filter(g=>selected.has(g.id)).slice(0,5);if(!q.length)q=games.slice(0,5);$("quickGames").innerHTML=q.map(g=>`<div class=mini><img src="${ico(g.id)}" onerror="this.style.visibility='hidden'"><div><b>${g.name}</b><small>${g.id}</small></div></div>`).join("")}
+document.querySelectorAll(".nav").forEach(n=>n.onclick=()=>{document.querySelectorAll(".nav").forEach(x=>x.classList.remove("on"));n.classList.add("on");document.querySelectorAll(".view").forEach(x=>x.style.display="none");$(n.dataset.v).style.display="block";let t={home:["Dashboard","Wybierz gry i wygeneruj konfigurację idle."],games:["Gry","Biblioteka i wybór gier."],presets:["Presety","Często używane zestawy."],accounts:["Konta","Lokalne profile."],data:["Import / Export","Przenoś kopie panelu."]}[n.dataset.v];$("title").textContent=t[0];$("sub").textContent=t[1]});
+$("search").oninput=gamesView;$("sort").onchange=gamesView;$("sv").onclick=()=>{let q=$("search").value.toLowerCase();games.filter(g=>g.name.toLowerCase().includes(q)||g.id.includes(q)).forEach(g=>{if(selected.size<32)selected.add(g.id)});save();refresh();toast("Zaznaczono")};$("cl").onclick=()=>{selected.clear();save();refresh()};
+document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{await navigator.clipboard.writeText($(b.dataset.copy).textContent);toast("Skopiowano")});
+function show(d){d.showModal()}$("add").onclick=()=>show($("dlg"));$("quick").onclick=()=>show($("qdlg"));document.querySelectorAll("[data-x]").forEach(x=>x.onclick=()=>x.closest("dialog").close());
+$("gf").onsubmit=e=>{e.preventDefault();let n=$("gn").value.trim(),id=$("gi").value.trim();if(!/^\d+$/.test(id)||games.some(g=>g.id===id)){$("ge").textContent="Nieprawidłowy lub istniejący AppID.";return}games.push({name:n,id,custom:true});save();$("dlg").close();refresh();toast("Dodano")};
+$("qf").onsubmit=e=>{e.preventDefault();let ids=$("qi").value.split(/[\s,;]+/).filter(x=>/^\d+$/.test(x));ids.forEach(id=>{if(!games.some(g=>g.id===id))games.push({name:"Steam App "+id,id,custom:true});if(selected.size<32)selected.add(id)});save();$("qdlg").close();refresh();toast("Dodano AppID")};
+$("preset").onclick=()=>{if(!selected.size)return toast("Wybierz gry");let n=prompt("Nazwa presetu:","Mój preset");if(n){presets.unshift({name:n,ids:[...selected]});save();refresh();toast("Zapisano preset")}};$("account").onclick=()=>{let n=prompt("Nazwa konta:","Main");if(n){accounts.push({name:n,ids:[...selected]});save();refresh();toast("Dodano konto")}};
+$("export").onclick=()=>{let b=new Blob([JSON.stringify({games,presets,accounts,selected:[...selected]},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="asf-idle-manager.json";a.click()};$("import").onclick=()=>$("file").click();$("file").onchange=async e=>{try{let d=JSON.parse(await e.target.files[0].text());games=d.games;presets=d.presets||[];accounts=d.accounts||[];selected=new Set((d.selected||[]).slice(0,32).map(String));save();refresh();toast("Zaimportowano")}catch{toast("Błędny plik")}};$("reset").onclick=()=>{if(confirm("Resetować wszystko?")){games=D;selected.clear();presets=[];accounts=[];save();refresh()}};
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="k"){e.preventDefault();document.querySelector('[data-v="games"]').click();$("search").focus()}});refresh();
